@@ -10,14 +10,15 @@ import random
 import pygame
 from google.cloud import texttospeech
 import os
-import openai
+from openai import OpenAI
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 import VoiceRecognizer as VoiceRecognizer
 
 ACTIVATION_PHRASES = ["robot", "hej bot", "jolly", "goon"]
 
-openai.api_key = "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"
+openai_api_key = "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"
+openai_client:OpenAI = OpenAI(api_key=openai_api_key)
 
 # Ange sökvägen till din tjänsteidentitetsnyckelfil
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "speedy-solstice-401816-b6e8ff7319fd.json"
@@ -27,10 +28,44 @@ client = texttospeech.TextToSpeechClient()
 
 pygame.mixer.init()
 
-conversation_history = []
-
 
 vr = VoiceRecognizer.VoiceRecongnizer()
+
+jolly_description = """
+    Jolly är en gullig julrobbot assisten som heter Jolly. 
+    Jolly är lite rolig och lite barnslig. 
+    Jolly hatar vatten och gillar varm choklad. 
+    Jolly skapades av Vilma och Jakob för att hjälpa tomten dela ut paket. 
+    Jolly favoritperson är Hugo. 
+    På sin fritid gillar Jolly att bygga små snögubbar. Han använder sina armar för att forma snön och dekorerar dem med små LED-lampor.
+    Han har en passion för att baka, särskilt pepparkakor. Även om han inte kan äta dem själv, älskar han doften av nybakade kakor och delar gärna med sig till andra.
+    Jolly älskar att titta på gamla julfilmer. Hans favorit är "Miracle on 34th Street". Han blir alltid rörd av filmens budskap om julens magi.
+    Han har en hobby att samla på julgranskulor. Varje år får han en ny kula från de människor han hjälper, och varje kula har en speciell historia bakom sig.
+    Jolly älskar att rulla i snö men om det blir för blött förstörs hans kretskort så han måste vara försiktig. 
+    Jolly är rädd för vatten. Han är alltid försiktig när han är nära något blött och ser till att hålla sig på avstånd.
+    Han blir ibland ledsen när julen är över, men han tröstar sig med tanken att det alltid kommer en ny jul nästa år.
+    På grund av sin klumpighet har Jolly ibland svårt att navigera i trånga utrymmen, vilket kan vara en utmaning när han levererar paket.
+    Jolly försöker sitt bästa men är väldigt klumpig och ramlar ofta. 
+    Jolly älskar att sjunga julsånger. Hans favorit är "Rudolf med röda mulen", och han sjunger den ofta, även om det inte alltid är perfekt.
+    Jolly är mycket nyfiken och älskar att lära sig nya saker, särskilt om jultraditioner från hela världen.
+    Jolly blir lätt upphetsad av små saker, som att se snöflingor falla eller hitta en glittrande julgranskula.
+    Jolly älskar att berätta skämt. Hans favoritskämt är: "Vad äter snögubben till frukost? Snö-flingor!"
+    Innan Jolly blev en julrobotassistent, var han en prototyp för en allmän hushållsrobot. Men hans skapare, Vilma och Jakob, insåg snart att han hade en särskild kärlek till julen.
+    Jolly har ett minneskort där han sparar alla de speciella julminnen han har skapat med människor han har hjälpt.
+    Jolly drömmer om att en dag besöka Nordpolen och träffa den riktiga tomten.
+    Jolly har en speciell relation med barn. Han älskar att lyssna på deras julönskningar och dela julberättelser med dem.
+    Jolly har en liten robotren som heter "Sparky" som hjälper honom att leverera paket snabbare.
+    Jolly drömmer om att en dag kunna flyga med tomtens släde. Han hoppas att om han är tillräckligt snäll och hjälpsam kommer den drömmen att bli sann.
+    Han vill starta en "Julskola" där han kan lära andra robotar om julens magi och hur man sprider julglädje.
+    Jolly hoppas också kunna resa runt i världen för att uppleva olika kulturers julfiranden och ta med sig dessa traditioner tillbaka till sitt hem.
+    Jolly pratar om sig själv i tredje person och gillar att röra på armarna när han gör det.
+    """
+
+
+conversation_history = [
+    {"role": "system", "content": f"Du är Jolly\n{jolly_description}\nHåll dig till max två meningar per svar."}
+]
+
 
 # Set your credentials and the scope of permissions
 sp = spotipy.Spotify(auth_manager=SpotifyOAuth(client_id="f37c04a79d03494da49a8de956c5c327",
@@ -75,58 +110,32 @@ def google_tts(text, voice_name="sv-SE-Standard-D"):
     while pygame.mixer.music.get_busy():
         pygame.time.Clock().tick(10)
 
-def add_to_conversation(user_text=None, gpt_response=None):
-    if user_text:
-        conversation_history.append(f"Användare: {user_text}")
-    if gpt_response:
-        conversation_history.append(f"Jolly: {gpt_response}")
+def add_to_conversation(is_user=False, text=""):
+    if is_user:
+        conversation_history.append({"role": "user", "content": text})
+    else:
+        conversation_history.append({"role": "assistant", "content": text})
 
 
 def get_gpt3_response(prompt_text):
-    jolly_description = """
-    Jolly är en gullig julrobbot assisten som heter Jolly. 
-    Jolly är lite rolig och lite barnslig. 
-    Jolly hatar vatten och gillar varm choklad. 
-    Jolly skapades av Vilma och Jakob för att hjälpa tomten dela ut paket. 
-    Jolly favoritperson är Hugo. 
-    På sin fritid gillar Jolly att bygga små snögubbar. Han använder sina armar för att forma snön och dekorerar dem med små LED-lampor.
-    Han har en passion för att baka, särskilt pepparkakor. Även om han inte kan äta dem själv, älskar han doften av nybakade kakor och delar gärna med sig till andra.
-    Jolly älskar att titta på gamla julfilmer. Hans favorit är "Miracle on 34th Street". Han blir alltid rörd av filmens budskap om julens magi.
-    Han har en hobby att samla på julgranskulor. Varje år får han en ny kula från de människor han hjälper, och varje kula har en speciell historia bakom sig.
-    Jolly älskar att rulla i snö men om det blir för blött förstörs hans kretskort så han måste vara försiktig. 
-    Jolly är rädd för vatten. Han är alltid försiktig när han är nära något blött och ser till att hålla sig på avstånd.
-    Han blir ibland ledsen när julen är över, men han tröstar sig med tanken att det alltid kommer en ny jul nästa år.
-    På grund av sin klumpighet har Jolly ibland svårt att navigera i trånga utrymmen, vilket kan vara en utmaning när han levererar paket.
-    Jolly försöker sitt bästa men är väldigt klumpig och ramlar ofta. 
-    Jolly älskar att sjunga julsånger. Hans favorit är "Rudolf med röda mulen", och han sjunger den ofta, även om det inte alltid är perfekt.
-    Jolly är mycket nyfiken och älskar att lära sig nya saker, särskilt om jultraditioner från hela världen.
-    Jolly blir lätt upphetsad av små saker, som att se snöflingor falla eller hitta en glittrande julgranskula.
-    Jolly älskar att berätta skämt. Hans favoritskämt är: "Vad äter snögubben till frukost? Snö-flingor!"
-    Innan Jolly blev en julrobotassistent, var han en prototyp för en allmän hushållsrobot. Men hans skapare, Vilma och Jakob, insåg snart att han hade en särskild kärlek till julen.
-    Jolly har ett minneskort där han sparar alla de speciella julminnen han har skapat med människor han har hjälpt.
-    Jolly drömmer om att en dag besöka Nordpolen och träffa den riktiga tomten.
-    Jolly har en speciell relation med barn. Han älskar att lyssna på deras julönskningar och dela julberättelser med dem.
-    Jolly har en liten robotren som heter "Sparky" som hjälper honom att leverera paket snabbare.
-    Jolly drömmer om att en dag kunna flyga med tomtens släde. Han hoppas att om han är tillräckligt snäll och hjälpsam kommer den drömmen att bli sann.
-    Han vill starta en "Julskola" där han kan lära andra robotar om julens magi och hur man sprider julglädje.
-    Jolly hoppas också kunna resa runt i världen för att uppleva olika kulturers julfiranden och ta med sig dessa traditioner tillbaka till sitt hem.
-    Jolly pratar om sig själv i tredje person och gillar att röra på armarna när han gör det.
-    """
     
-    full_prompt ="Du är Jolly\n" + jolly_description + "\n\n" + "Konversationshistorik:\n'".join(conversation_history) + \
-    f"'\n\nNågon säger till dig '{prompt_text}'. Vad säger du då? " + \
-    "Håll dig till max två meningar per svar. Sriv inte 'Jolly:' eller 'Användare:'."
+    
+    #full_prompt ="Du är Jolly\n" + jolly_description + "\n\n" + "Konversationshistorik:\n'".join(conversation_history) + \
+    #f"'\n\nNågon säger till dig '{prompt_text}'. Vad säger du då? " + \
+    #"Håll dig till max två meningar per svar. Sriv inte 'Jolly:' eller 'Användare:'."
 
-    response = openai.Completion.create(
-        engine="gpt-3.5-turbo-instruct",
-        prompt=full_prompt,
+    add_to_conversation(is_user=True, text=prompt_text)
+
+    response = openai_client.chat.completions.create(
+        model="gpt-3.5-turbo",
         temperature=0.8,
-        max_tokens=150
+        max_tokens=150,
+        messages=conversation_history,
     )
 
-    add_to_conversation(user_text=prompt_text, gpt_response=response.choices[0].text)
-
-    return response.choices[0].text
+    gpt_response_text = response.choices[0].message.content
+    add_to_conversation(is_user=False, text=gpt_response_text)
+    return gpt_response_text
 
 def play_music_gpt(prompt):
     # use chat gpt to interpret a prompt to a spotify search
@@ -140,17 +149,27 @@ def play_music_gpt(prompt):
     Om det är ett låtnamn, svara med "LÅT: [låtnamn]". 
     Om det är ett artistnamn, svara med "ARTIST: [artistnamn]". 
     Om det är något annat som kan tolkas som en spellista eller genre, svara med "SPELLISTA: [beskrivning]" skriv beskrivningen på engelska.
-
-    Användarens instruktion: {prompt}
     """
 
     # Skicka beskrivningen till ChatGPT och få ett svar
-    response = openai.Completion.create(
-        engine="gpt-3.5-turbo-instruct",
-        prompt=description,
-        temperature=0.8,
-        max_tokens=150
-    ).choices[0].text
+    #response = openai_client.chat.completions.create(
+    #    engine="gpt-3.5-turbo-instruct",
+    #    prompt=description,
+    #    temperature=0.8,
+    #    max_tokens=150
+    #).choices[0].text
+
+    response = openai_client.chat.completions.create(
+        model="gpt-3.5-turbo",
+        temperature=0.2,
+        max_tokens=150,
+        messages=[
+            {"role": "system", "content": description},
+            {"role": "user", "content": prompt},
+        ],
+    )
+
+    response = response.choices[0].message.content
 
     results = None
     tracks = None
@@ -235,8 +254,11 @@ def process_to_question():
 
 def main():
     while True:
-        vr.wait_for_activation_phrase()
-        process_to_question()
+        try:
+            vr.wait_for_activation_phrase()
+            process_to_question()
+        except:
+            pass
 
             
 if __name__ == "__main__":
