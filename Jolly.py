@@ -16,7 +16,7 @@ from spotipy.oauth2 import SpotifyOAuth
 import VoiceRecognizer as VoiceRecognizer
 import api_key
 
-IS_PI = False
+IS_PI = True
 if IS_PI:
     import RPi.GPIO as GPIO
     LED_PIN_RED = 22
@@ -251,17 +251,17 @@ def process_to_question():
 
     
     if IS_PI:
-        GPIO.output(LED_PIN_RED, GPIO.LOW) # led off
-        GPIO.output(LED_PIN_GREEN, GPIO.LOW) # led off
-        GPIO.output(LED_PIN_BLUE, GPIO.HIGH) # led on
+        GPIO.output(LED_PIN_RED, GPIO.HIGH) # led off
+        GPIO.output(LED_PIN_GREEN, GPIO.HIGH) # led off
+        GPIO.output(LED_PIN_BLUE, GPIO.LOW) # led on
 
     text = vr.listen_for_command()
     print("Du sa: " + text)
     
     if IS_PI:
-        GPIO.output(LED_PIN_RED, GPIO.HIGH) # led off
-        GPIO.output(LED_PIN_GREEN, GPIO.HIGH) # led off
-        GPIO.output(LED_PIN_BLUE, GPIO.LOW) # led on
+        GPIO.output(LED_PIN_RED, GPIO.LOW) # led on
+        GPIO.output(LED_PIN_GREEN, GPIO.LOW) # led on
+        GPIO.output(LED_PIN_BLUE, GPIO.HIGH) # led off
 
     if(process_to_music_commands(text)):
         return
@@ -270,9 +270,9 @@ def process_to_question():
     response = get_gpt3_response(text)
     
     if IS_PI:
-        GPIO.output(LED_PIN_RED, GPIO.LOW) # led off
-        GPIO.output(LED_PIN_GREEN, GPIO.HIGH) # led off
-        GPIO.output(LED_PIN_BLUE, GPIO.LOW) # led on
+        GPIO.output(LED_PIN_RED, GPIO.HIGH) # led off
+        GPIO.output(LED_PIN_GREEN, GPIO.LOW) # led on
+        GPIO.output(LED_PIN_BLUE, GPIO.HIGH) # led off
 
     print("Response: " + response)
     google_tts(response)
@@ -282,17 +282,12 @@ def process_to_question():
 
 
 def main():
-    if IS_PI:
-        GPIO.output(LED_PIN_RED, GPIO.LOW) # led off
-        GPIO.output(LED_PIN_GREEN, GPIO.LOW) # led off
-        GPIO.output(LED_PIN_BLUE, GPIO.LOW) # led off
-
     while True:
         try:
             if IS_PI:
-                GPIO.output(LED_PIN_RED, GPIO.LOW) # led on
-                GPIO.output(LED_PIN_GREEN, GPIO.LOW) # led on
-                GPIO.output(LED_PIN_BLUE, GPIO.LOW) # led on
+                GPIO.output(LED_PIN_RED, GPIO.HIGH) # led off
+                GPIO.output(LED_PIN_GREEN, GPIO.HIGH) # led off
+                GPIO.output(LED_PIN_BLUE, GPIO.HIGH) # led off
             vr.wait_for_activation_phrase()
             process_to_question()
         except Exception as e:
