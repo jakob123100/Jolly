@@ -44,7 +44,7 @@ class servo:
             raise Exception("servo not initialized")
 
         #self.move_servo(self.servo, angle)
-        asyncio.run(self.move_servo_async(self.servo, angle))
+        asyncio.run(self.move_servo(self.servo, angle))
 
     async def move_servo(self, servo, angle):
         """
