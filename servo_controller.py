@@ -1,5 +1,6 @@
 import asyncio
 import math
+import threading
 # Set up libraries and overall settings
 import RPi.GPIO as GPIO  # Imports the standard Raspberry Pi GPIO library
 from time import sleep   # Imports sleep (aka wait or pause) into the program
@@ -44,9 +45,9 @@ class servo:
             raise Exception("servo not initialized")
 
         #self.move_servo(self.servo, angle)
-        asyncio.run(self.move_servo(self.servo, angle))
+        thread = threading.Thread(target=self.move_servo, args=(self.servo, angle)).start()
 
-    async def move_servo(self, servo, angle):
+    def move_servo(self, servo, angle):
         """
         Moves the servo to the specified angle.
 
