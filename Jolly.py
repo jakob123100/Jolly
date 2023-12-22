@@ -15,8 +15,21 @@ import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 import VoiceRecognizer as VoiceRecognizer
 import api_key
+import time
 
 IS_PI = True
+
+import requests
+def has_internet_connection():
+    try:
+        response = requests.get("https://google.com", timeout=5)
+        return True
+    except Exception as e:
+        return False
+
+while(not has_internet_connection()):
+    pass
+
 if IS_PI:
     import RPi.GPIO as GPIO
     LED_PIN_RED = 22
@@ -26,6 +39,8 @@ if IS_PI:
     GPIO.setup(LED_PIN_RED, GPIO.OUT)
     GPIO.setup(LED_PIN_GREEN, GPIO.OUT)
     GPIO.setup(LED_PIN_BLUE, GPIO.OUT)
+
+
 
 ACTIVATION_PHRASES = ["robot", "hej bot", "jolly", "goon"]
 
@@ -116,6 +131,7 @@ def google_tts(text, voice_name="sv-SE-Standard-D"):
         out.write(response.audio_content)
 
     # Spela upp ljudet med pygame
+    pygame.mixer.init()
     pygame.mixer.music.unload()
     pygame.mixer.music.load("output.mp3")
     pygame.mixer.music.play()
@@ -285,9 +301,9 @@ def main():
     while True:
         try:
             if IS_PI:
-                GPIO.output(LED_PIN_RED, GPIO.HIGH) # led off
-                GPIO.output(LED_PIN_GREEN, GPIO.HIGH) # led off
-                GPIO.output(LED_PIN_BLUE, GPIO.HIGH) # led off
+                GPIO.output(LED_PIN_RED, GPIO.LOW) # led off
+                GPIO.output(LED_PIN_GREEN, GPIO.LOW) # led off
+                GPIO.output(LED_PIN_BLUE, GPIO.LOW) # led off
             vr.wait_for_activation_phrase()
             process_to_question()
         except Exception as e:

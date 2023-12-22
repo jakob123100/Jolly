@@ -91,10 +91,11 @@ class VoiceRecongnizer:
         Waits for an activation phrase to be detected.
         """
         print("Waiting for activation phrase...")
+        mic = sr.Microphone()
 
         self.recognizer.pause_threshold = self.recognizer_activation_pause_threshold
         self.__got_activation_phrase.value = False
-        stop_listening = self.recognizer.listen_in_background(sr.Microphone(), self.__sound_recived_callback)
+        stop_listening = self.recognizer.listen_in_background(mic, self.__sound_recived_callback)
 
         while self.__got_activation_phrase.value == False:
             time.sleep(0.1)
@@ -115,7 +116,8 @@ class VoiceRecongnizer:
 
         self.recognizer.pause_threshold = self.recognizer_listen_pause_threshold
        
-        with sr.Microphone() as source:
+        mic = sr.Microphone()
+        with mic as source:
             audio = self.recognizer.listen(source)
             prompts = self.__process_audio(audio)
             if prompts:
