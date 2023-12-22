@@ -120,7 +120,7 @@ class servo_controller:
         Args:
             angle (float): The angle to which the left arm servo should be moved.
         """
-        self.left_arm.move(angle)
+        self.left_arm.move(-angle)
     
     def move_head(self, angle):
         """
