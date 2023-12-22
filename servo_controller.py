@@ -1,3 +1,4 @@
+import asyncio
 import math
 # Set up libraries and overall settings
 import RPi.GPIO as GPIO  # Imports the standard Raspberry Pi GPIO library
@@ -42,9 +43,10 @@ class servo:
         if(self.is_initialized == False):
             raise Exception("servo not initialized")
 
-        self.move_servo(self.servo, angle)
+        #self.move_servo(self.servo, angle)
+        asyncio.run(self.move_servo_async(self.servo, angle))
 
-    def move_servo(self, servo, angle):
+    async def move_servo(self, servo, angle):
         """
         Moves the servo to the specified angle.
 
