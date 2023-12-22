@@ -124,3 +124,24 @@ class servo_controller:
             angle (float): The angle to which the head servo should be moved.
         """
         self.head.move(angle)
+
+def test():
+    servo_controller = servo_controller()
+    servo_controller.move_right_arm(90)
+    servo_controller.move_left_arm(90)
+    servo_controller.move_head(90)
+    sleep(1)
+    servo_controller.move_right_arm(0)
+    servo_controller.move_left_arm(0)
+    servo_controller.move_head(0)
+    sleep(1)
+    servo_controller.move_right_arm(180)
+    servo_controller.move_left_arm(180)
+    servo_controller.move_head(180)
+    sleep(1)
+    servo_controller.move_right_arm(90)
+    servo_controller.move_left_arm(90)
+    servo_controller.move_head(90)
+
+if __name__ == '__main__':
+    test()
