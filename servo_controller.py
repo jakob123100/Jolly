@@ -7,6 +7,8 @@ class servo:
     """
     A class that represents a servo motor.
     """
+    MIN_VALUE = 2
+    SCALE = 10
 
     pin: int
     servo: GPIO.PWM
@@ -61,7 +63,7 @@ class servo:
 
         print("Moving servo to angle " + str(angle) + " with z = " + str(z))
 
-        angle = angle / self.range_of_motion
+        angle = angle / self.range_of_motion * self.SCALE + self.MIN_VALUE
 
         servo.ChangeDutyCycle(angle)
         sleep(z)
