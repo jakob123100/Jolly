@@ -52,7 +52,7 @@ class servo:
             servo (GPIO.PWM): The PWM object representing the servo.
             angle (float): The angle to which the servo should be moved.
         """
-        angle = min(angle, 180)
+        angle = min(angle, 179)
         angle = max(angle, 0)
 
         if(angle == self.current_angle):
