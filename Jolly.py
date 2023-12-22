@@ -17,7 +17,7 @@ import VoiceRecognizer as VoiceRecognizer
 import api_key
 import time
 
-IS_PI = True
+IS_PI = False
 
 import requests
 def has_internet_connection():
