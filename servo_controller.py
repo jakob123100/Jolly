@@ -61,6 +61,8 @@ class servo:
 
         print("Moving servo to angle " + str(angle) + " with z = " + str(z))
 
+        angle = angle / self.range_of_motion
+
         servo.ChangeDutyCycle(angle)
         sleep(z)
         servo.ChangeDutyCycle(0)
