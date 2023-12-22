@@ -59,6 +59,8 @@ class servo:
         z = abs(angle - self.current_angle) / self.range_of_motion
         z = max(z, 0.1)
 
+        print("Moving servo to angle " + str(angle) + " with z = " + str(z))
+
         servo.ChangeDutyCycle(angle)
         sleep(z)
         servo.ChangeDutyCycle(0)
