@@ -77,8 +77,8 @@ class servo_controller:
     """
 
     DEFAULT_RIGHT_ARM_PIN = 16
-    DEFAULT_LEFT_ARM_PIN = 18
-    DEFAULT_HEAD_PIN = 22
+    DEFAULT_LEFT_ARM_PIN = 22
+    DEFAULT_HEAD_PIN = 18
     SERVO_RANGE_OF_MOTION = 180
 
     right_arm: servo
