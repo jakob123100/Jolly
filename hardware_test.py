@@ -1,6 +1,9 @@
-from servo_controller import servo_controller
-from led_controller import led_controller, colors
+#from servo_controller import servo_controller
+#from led_controller import led_controller, colors
 from time import sleep
+import math
+from gpiozero import Servo
+from gpiozero.pins.pigpio import PiGPIOFactory
 
 def test():
     sc = servo_controller()
@@ -36,5 +39,15 @@ def test():
 
     lc.set_light_string(False)
 
+def test2():
+    factory = PiGPIOFactory()
+    right_arm_pin = 23
+    servo = Servo(right_arm_pin, min_pulse_width=0.5/1000, max_pulse_width=2.5/1000, pin_factory=factory)
+    while True:
+        for i in range(0,360):
+            servo.value = math.sin(math.radians(i))
+            sleep(0.01)
+
+
 if __name__ == '__main__':
-    test()
+    test2()
