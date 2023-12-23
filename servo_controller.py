@@ -122,7 +122,7 @@ class servo_controller:
         self.is_initialized = True
     
     def move_servo(self, servo, angle):
-        servo.value(angle/90 - 1)
+        servo.value = angle/90 - 1
 
     def move_right_arm(self, angle):
         self.move_servo(self.right_arm, angle)
