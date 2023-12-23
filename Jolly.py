@@ -268,6 +268,7 @@ def get_movement_command(prompt, response):
     Vänster arm, höger arm och huvud ska vara tal mellan 0 och 1 där 0 är nedåt/vänster och 1 är uppåt/höger.
     Ett exempel på ett svar är "Vänster: 0.5, Höger: 0.5, HUVUD: 0.5, SLEEP: 2, Vänster: 0.2, Höger: 0.8, HUVUD: 0.3, SLEEP: 1".
     Ditt vanliga svar ska vara "Vänster: 0, Höger: 0, HUVUD: 0, SLEEP: 0".
+    Håll dig till max 3 kommandon per svar.
     """
 
     if response == "":
@@ -275,7 +276,7 @@ def get_movement_command(prompt, response):
         response = openai_client.chat.completions.create(
             model="gpt-3.5-turbo",
             temperature=0.2,
-            max_tokens=150,
+            max_tokens=200,
             messages=[
                 {"role": "system", "content": description},
                 {"role": "user", "content": prompt},
@@ -286,7 +287,7 @@ def get_movement_command(prompt, response):
     response = openai_client.chat.completions.create(
         model="gpt-3.5-turbo",
         temperature=0.2,
-        max_tokens=150,
+        max_tokens=200,
         messages=[
             {"role": "system", "content": description},
             {"role": "user", "content": prompt},
