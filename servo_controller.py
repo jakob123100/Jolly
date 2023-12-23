@@ -137,5 +137,11 @@ def test():
 
     sc.wait_until_done()
 
+    sc.move_right_arm(0, 2)
+    #sc.move_left_arm(0, 2)
+    #sc.move_head(0, 2)
+
+    sc.wait_until_done()
+
 if __name__ == '__main__':
     test()
