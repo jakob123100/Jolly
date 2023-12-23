@@ -16,10 +16,9 @@ from spotipy.oauth2 import SpotifyOAuth
 import VoiceRecognizer as VoiceRecognizer
 import api_key
 import time
-import led_controller
-import servo_controller
+import threading
 
-IS_PI = False
+IS_PI = True
 
 import requests
 def has_internet_connection():
@@ -33,7 +32,10 @@ while(not has_internet_connection()):
     pass
 
 if IS_PI:
+    import led_controller
+    import servo_controller
     led_con = led_controller.led_controller()
+    servo_con = servo_controller.servo_controller()
     led_con.set_eye_color(led_controller.colors.black)
 
 
@@ -255,10 +257,51 @@ def process_to_music_commands(prompt) -> bool:
     
     return False
 
-def get_movement_command(prompt):
-    desciption = """
-    Du ska tolka användarens instruktion för att styra Jollys rörelser.
+def get_movement_command(prompt, response):
+    description = """
+    Du ska tolka användarens instruktion och en robots svar för att styra robotens armar och huvud.
+    Ditt svar ska vara en serie av kommandon separerade med 'SLEEP [tid i sekunder]'.
+    Varje kommando ska vara på formen "Vänster: [vänster arm], Höger: [höger arm], HUVUD: [huvud]".
+    Vänster arm, höger arm och huvud ska vara tal mellan 0 och 1 där 0 är nedåt/vänster och 1 är uppåt/höger.
+    Ett exempel på ett svar är "Vänster: 0.5, Höger: 0.5, HUVUD: 0.5, SLEEP: 2, Vänster: 0.2, Höger: 0.8, HUVUD: 0.3, SLEEP: 1".
     """
+
+    # Skicka beskrivningen till ChatGPT och få ett svar
+    response = openai_client.chat.completions.create(
+        model="gpt-3.5-turbo",
+        temperature=0.2,
+        max_tokens=150,
+        messages=[
+            {"role": "system", "content": description},
+            {"role": "user", "content": prompt},
+            {"role": "assistant", "content": response},
+        ],
+    )
+
+    response = response.choices[0].message.content
+    print("Movement response: " + response)
+
+    commands = []
+    
+    for command in response.split(","):
+        print(command)
+        action = command.split(":")[0].strip()
+        value = float(command.split(":")[1].strip())
+        
+        commands.append((action, value))
+
+    return commands
+
+def process_movement_commands(commands):
+    for command in commands:
+        if(command[0] == "Vänster"):
+            servo_con.move_left_arm(command[1])
+        elif(command[0] == "Höger"):
+            servo_con.move_right_arm(command[1])
+        elif(command[0] == "HUVUD"):
+            servo_con.move_head(command[1])
+        elif(command[0] == "SLEEP"):
+            time.sleep(command[1])
 
 def process_to_question():
     # play a sound to indicate that the robot is listening
@@ -285,14 +328,20 @@ def process_to_question():
     if IS_PI:
         led_con.set_eye_color(led_controller.colors.green)
 
+    if IS_PI:
+        movment_commands = get_movement_command(text, response)
+        thread = threading.Thread(target=process_movement_commands, args=(movment_commands,))
+
     print("Response: " + response)
     google_tts(response)
 
     if("?" in response):
         process_to_question()
 
-
 def main():
+    if IS_PI:
+        led_con.set_light_string(True)
+
     while True:
         try:
             if IS_PI:
