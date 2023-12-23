@@ -323,7 +323,10 @@ def process_to_question():
         return
 
     # Respond using Text-to-Speech
-    response = get_gpt3_response(text)
+    try:
+        response = get_gpt3_response(text)
+    except Exception as e:
+        response = ""
     
     if IS_PI:
         led_con.set_eye_color(colors.green)
@@ -331,6 +334,9 @@ def process_to_question():
     if IS_PI:
         movment_commands = get_movement_command(text, response)
         thread = threading.Thread(target=process_movement_commands, args=(movment_commands,)).start()
+
+    if response == "":
+        return
 
     print("Response: " + response)
     google_tts(response)
