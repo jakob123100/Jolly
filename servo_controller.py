@@ -3,7 +3,7 @@ import math
 import threading
 # Set up libraries and overall settings
 import RPi.GPIO as GPIO  # Imports the standard Raspberry Pi GPIO library
-import time   # Imports sleep (aka wait or pause) into the program
+from time import sleep   # Imports sleep (aka wait or pause) into the program
 
 class servo:
     """
@@ -69,13 +69,14 @@ class servo:
 
         angle = angle / self.range_of_motion * self.SCALE + self.MIN_VALUE
 
-        start_angle = self.current_angle
-        start_time = time.time()
-        while(time.time() - start_time <= time_to_move):
-            new_angle = start_angle + (time.time() - start_time) / time_to_move * (angle - start_angle)
-            servo.ChangeDutyCycle(new_angle)
+        for i in range(0, 10):
+            servo.ChangeDutyCycle(angle)
+            sleep(0.1)
+            servo.ChangeDutyCycle(0)
+            sleep(0.1)
 
-        #servo.ChangeDutyCycle(angle)
+        servo.ChangeDutyCycle(angle)
+        sleep(time_to_move)
         servo.ChangeDutyCycle(0)
 
         self.current_angle = angle
