@@ -293,6 +293,7 @@ def get_movement_command(prompt, response):
     return commands
 
 def process_movement_commands(commands):
+    hold_time = 0
     for command in commands:
         if(command[0] == "Vänster"):
             servo_con.move_left_arm(command[1] * servo_con.SERVO_RANGE_OF_MOTION, 2)
@@ -370,6 +371,10 @@ def main():
             if IS_PI:
                 led_con.set_eye_color(colors.black)
                 led_con.set_light_string(False)
+                servo_con.move_left_arm(0, 2)
+                servo_con.move_right_arm(0, 2)
+                servo_con.move_head(90, 2)
+                servo_con.wait_until_done()
             break
         except Exception as e:
             print(e)
