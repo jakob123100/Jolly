@@ -146,6 +146,7 @@ class servo_controller:
             sleep(0.01)
         
         servo.value = angle/90 - 1
+        print("Done moving servo to angle " + str(angle))
 
     def move_right_arm(self, angle, duration = 0):
         if duration > 0:
@@ -173,14 +174,18 @@ class servo_controller:
 
 def test():
     sc = servo_controller()
-    sc.move_right_arm(90, 2)
-    sc.move_left_arm(90, 2)
-    sc.move_head(90, 2)
+    sc.move_right_arm(0)
+    sc.move_left_arm(0)
+    sc.move_head(0)
     sleep(1)
+    #sc.move_right_arm(90, 2)
+    #sc.move_left_arm(90, 2)
+    #sc.move_head(90, 2)
+    #sleep(1)
     sc.move_right_arm(0, 2)
     sc.move_left_arm(0, 2)
     sc.move_head(0, 2)
-    sleep(1)
+    sleep(2)
     sc.move_right_arm(180, 2)
     sc.move_left_arm(180, 2)
     sc.move_head(180, 2)
