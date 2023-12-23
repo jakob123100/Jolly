@@ -36,6 +36,9 @@ if IS_PI:
     from servo_controller import servo_controller
     led_con: led_controller = led_controller()
     servo_con: servo_controller = servo_controller()
+    servo_con.move_right_arm(0)
+    servo_con.move_left_arm(0)
+    servo_con.move_head(90)
     led_con.set_eye_color(colors.black)
 
 
@@ -353,10 +356,6 @@ def process_to_question():
 def main():
     if IS_PI:
         led_con.set_light_string(True)
-        servo_con.move_left_arm(0, 2)
-        servo_con.move_right_arm(0, 2)
-        servo_con.move_head(90, 2)
-        servo_con.wait_until_done()
 
     while True:
         try:
