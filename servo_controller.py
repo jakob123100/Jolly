@@ -55,21 +55,21 @@ class servo:
             servo (GPIO.PWM): The PWM object representing the servo.
             angle (float): The angle to which the servo should be moved.
         """
-        angle = min(angle, 179)
+        angle = min(angle, self.range_of_motion - 1)
         angle = max(angle, 0)
 
         if(angle == self.current_angle):
             return
         
-        z = abs(angle - self.current_angle) / self.range_of_motion
-        z = max(z, 0.1)
+        time_to_move = abs(angle - self.current_angle) / self.range_of_motion
+        time_to_move = max(time_to_move, 0.1)
 
-        print("Moving servo to angle " + str(angle) + " with z = " + str(z))
+        print("Moving servo to angle " + str(angle) + " with z = " + str(time_to_move))
 
         angle = angle / self.range_of_motion * self.SCALE + self.MIN_VALUE
 
         servo.ChangeDutyCycle(angle)
-        sleep(z)
+        sleep(time_to_move)
         servo.ChangeDutyCycle(0)
 
         self.current_angle = angle
