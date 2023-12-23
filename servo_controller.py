@@ -120,20 +120,20 @@ class servo_controller:
 def test():
     sc = servo_controller()
     sc.move_right_arm(0)
-    sc.move_left_arm(0)
-    sc.move_head(0)
+    #sc.move_left_arm(0)
+    #sc.move_head(0)
 
     sc.wait_until_done()
 
     sc.move_right_arm(180, 2)
-    sc.move_left_arm(180, 2)
-    sc.move_head(180, 2)
+    #sc.move_left_arm(180, 2)
+    #sc.move_head(180, 2)
 
     sc.wait_until_done()
     
     sc.move_right_arm(90, 2)
-    sc.move_left_arm(90, 2)
-    sc.move_head(90, 2)
+    #sc.move_left_arm(90, 2)
+    #sc.move_head(90, 2)
 
     sc.wait_until_done()
 
