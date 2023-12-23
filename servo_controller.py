@@ -1,6 +1,5 @@
 import asyncio
 import math
-import threading
 # Set up libraries and overall settings
 import RPi.GPIO as GPIO  # Imports the standard Raspberry Pi GPIO library
 from time import sleep, time   # Imports sleep (aka wait or pause) into the program
@@ -8,81 +7,6 @@ from gpiozero import Servo
 from gpiozero.pins.pigpio import PiGPIOFactory
 from multiprocessing import Process
 
-class servo:
-    """
-    A class that represents a servo motor.
-    """
-    MIN_VALUE = 2
-    SCALE = 10
-
-    pin: int
-    servo: GPIO.PWM
-    range_of_motion: int = 180
-    current_angle: float = 0
-    movement_time: float = 10
-
-    is_initialized: bool = False
-
-    def __init__(self, pin, range_of_motion=180):
-        """
-        Initializes the servo object.
-
-        Args:
-            pin (int): The GPIO pin number to which the servo is connected.
-            range_of_motion (int, optional): The range of motion of the servo in degrees. Defaults to 180.
-        """
-        self.pin = pin
-        self.range_of_motion = range_of_motion
-        GPIO.setup(self.pin, GPIO.OUT)
-        self.servo = GPIO.PWM(self.pin, 50)
-        self.servo.start(0)
-        self.is_initialized = True
-
-    def move(self, angle):
-        """
-        Moves the servo to the specified angle.
-
-        Args:
-            angle (float): The angle to which the servo should be moved.
-        """
-        if(self.is_initialized == False):
-            raise Exception("servo not initialized")
-
-        #self.move_servo(self.servo, angle)
-        thread = threading.Thread(target=self.move_servo, args=(self.servo, angle)).start()
-
-    def move_servo(self, servo, angle):
-        """
-        Moves the servo to the specified angle.
-
-        Args:
-            servo (GPIO.PWM): The PWM object representing the servo.
-            angle (float): The angle to which the servo should be moved.
-        """
-        angle = min(angle, self.range_of_motion - 1)
-        angle = max(angle, 0)
-
-        if(angle == self.current_angle):
-            return
-        
-        time_to_move = abs(angle - self.current_angle) / self.range_of_motion * self.movement_time + 0.1
-        time_to_move = max(time_to_move, 0.1)
-
-        print("Moving servo to angle " + str(angle) + " with z = " + str(time_to_move))
-
-        angle = angle / self.range_of_motion * self.SCALE + self.MIN_VALUE
-
-        for i in range(0, 10):
-            servo.ChangeDutyCycle(angle)
-            sleep(0.1)
-            servo.ChangeDutyCycle(0)
-            sleep(0.1)
-
-        servo.ChangeDutyCycle(angle)
-        sleep(time_to_move)
-        servo.ChangeDutyCycle(0)
-
-        self.current_angle = angle
 
 class servo_controller:
     """
@@ -101,6 +25,10 @@ class servo_controller:
     right_arm_angle: float = 0
     left_arm_angle: float = 0
     head_angle: float = 0
+
+    __left_arm_process: Process = None
+    __right_arm_process: Process = None
+    __head_process: Process = None
 
     is_initialized: bool = False
 
@@ -150,7 +78,8 @@ class servo_controller:
 
     def move_right_arm(self, angle, duration = 0):
         if duration > 0:
-            self.__smooth_move_over_time(self.right_arm, angle, duration)
+            self.__right_arm_process = Process(target=self.__smooth_move_over_time, args=(self.right_arm, angle, duration))
+            self.__right_arm_process.start()
         else:
             self.__move_servo(self.right_arm, angle)
 
@@ -158,7 +87,8 @@ class servo_controller:
     
     def move_left_arm(self, angle, duration = 0):
         if duration > 0:
-            self.__smooth_move_over_time(self.left_arm, 180 - angle, duration)
+            self.__left_arm_process = Process(target=self.__smooth_move_over_time, args=(self.left_arm, 180 - angle, duration))
+            self.__left_arm_process.start()
         else:
             self.__move_servo(self.left_arm, 180 -  angle)
 
@@ -166,43 +96,44 @@ class servo_controller:
     
     def move_head(self, angle, duration = 0):
         if duration > 0:
-            self.__smooth_move_over_time(self.head, angle, duration)
+            self.__head_process = Process(target=self.__smooth_move_over_time, args=(self.head, angle, duration))
+            self.__head_process.start()
         else:
             self.__move_servo(self.head, angle)
 
         self.head_angle = angle
+    
+    def wait_until_done(self):
+        if self.__left_arm_process != None:
+            self.__left_arm_process.join()
+        if self.__right_arm_process != None:
+            self.__right_arm_process.join()
+        if self.__head_process != None:
+            self.__head_process.join()
+        
+        self.__left_arm_process = None
+        self.__right_arm_process = None
+        self.__head_process = None
 
 def test():
     sc = servo_controller()
-    p1 = Process(target=sc.move_right_arm, args=(0,))
-    p2 = Process(target=sc.move_left_arm, args=(0,))
-    p3 = Process(target=sc.move_head, args=(0,))
-    p1.start()
-    p2.start()
-    p3.start()
-    p1.join()
-    p2.join()
-    p3.join()
+    sc.move_right_arm(0)
+    sc.move_left_arm(0)
+    sc.move_head(0)
 
-    p1 = Process(target=sc.move_right_arm, args=(180, 2, ))
-    p2 = Process(target=sc.move_left_arm, args=(180, 2 ,))
-    p3 = Process(target=sc.move_head, args=(180, 2 ,))
-    p1.start()
-    p2.start()
-    p3.start()
-    p1.join()
-    p2.join()
-    p3.join()
+    sc.wait_until_done()
+
+    sc.move_right_arm(180, 2)
+    sc.move_left_arm(180, 2)
+    sc.move_head(180, 2)
+
+    sc.wait_until_done()
     
-    p1 = Process(target=sc.move_right_arm, args=(90, 2, ))
-    p2 = Process(target=sc.move_left_arm, args=(90, 2, ))
-    p3 = Process(target=sc.move_head, args=(90, 2, ))
-    p1.start()
-    p2.start()
-    p3.start()
-    p1.join()
-    p2.join()
-    p3.join()
+    sc.move_right_arm(90, 2)
+    sc.move_left_arm(90, 2)
+    sc.move_head(90, 2)
+
+    sc.wait_until_done()
 
 if __name__ == '__main__':
     test()

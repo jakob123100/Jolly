@@ -1,5 +1,5 @@
-#from servo_controller import servo_controller
-#from led_controller import led_controller, colors
+from servo_controller import servo_controller
+from led_controller import led_controller, colors
 from time import sleep
 import math
 from gpiozero import Servo
