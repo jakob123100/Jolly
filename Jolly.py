@@ -355,8 +355,11 @@ def process_to_question():
         led_con.set_eye_color(colors.green)
 
     if IS_PI:
-        movment_commands = get_movement_command(text, response)
-        thread = threading.Thread(target=process_movement_commands, args=(movment_commands,)).start()
+        try:
+            movment_commands = get_movement_command(text, response)
+            thread = threading.Thread(target=process_movement_commands, args=(movment_commands,)).start()
+        except Exception as e:
+            pass
 
     if response == "":
         return
