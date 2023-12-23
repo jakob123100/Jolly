@@ -361,6 +361,11 @@ def main():
                 led_con.set_eye_color(colors.white)
             vr.wait_for_activation_phrase()
             process_to_question()
+        except KeyboardInterrupt:
+            if IS_PI:
+                led_con.set_eye_color(colors.black)
+                led_con.set_light_string(False)
+            break
         except Exception as e:
             print(e)
             continue
