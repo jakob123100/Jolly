@@ -6,7 +6,7 @@ from led_controller import led_controller, colors
 class TestLedController(unittest.TestCase):
 
     def setUp(self):
-        GPIO.setmode(GPIO.BCM)
+        GPIO.setmode(GPIO.BOARD)
         GPIO.setwarnings(False)
         self.controller = led_controller()
 

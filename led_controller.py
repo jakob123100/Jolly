@@ -18,10 +18,10 @@ class led_controller:
     A class that controls an LED strip connected to a Raspberry Pi using GPIO pins.
     """
 
-    DEFAULT_RED_PIN = 22
-    DEFAULT_GREEN_PIN = 17
-    DEFAULT_BLUE_PIN = 27
-    DEFAULT_LIGHT_STRING_PIN = 12
+    DEFAULT_RED_PIN = 11
+    DEFAULT_GREEN_PIN = 13
+    DEFAULT_BLUE_PIN = 15
+    DEFAULT_LIGHT_STRING_PIN = 32
 
     red_pin: int
     green_pin: int
@@ -49,7 +49,7 @@ class led_controller:
         self.blue_pin = blue_pin
         self.light_string_pin = light_string_pin
 
-        GPIO.setmode(GPIO.BCM)
+        GPIO.setmode(GPIO.BOARD)
         GPIO.setup(self.red_pin, GPIO.OUT)
         GPIO.setup(self.green_pin, GPIO.OUT)
         GPIO.setup(self.blue_pin, GPIO.OUT)
