@@ -330,7 +330,7 @@ def process_to_question():
 
     if IS_PI:
         movment_commands = get_movement_command(text, response)
-        thread = threading.Thread(target=process_movement_commands, args=(movment_commands,))
+        thread = threading.Thread(target=process_movement_commands, args=(movment_commands,)).start()
 
     print("Response: " + response)
     google_tts(response)
