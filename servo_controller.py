@@ -97,6 +97,10 @@ class servo_controller:
     left_arm: Servo
     head: Servo
 
+    right_arm_angle: float = 0
+    left_arm_angle: float = 0
+    head_angle: float = 0
+
     is_initialized: bool = False
 
     def __init__(self, right_arm_pin=DEFAULT_RIGHT_ARM_PIN, left_arm_pin=DEFAULT_LEFT_ARM_PIN, head_pin=DEFAULT_HEAD_PIN):
@@ -126,7 +130,7 @@ class servo_controller:
     
     def __smooth_move_over_time(self, servo, angle, duration):
         current_angle = servo.value
-        angle_delta = (angle/90) - current_angle
+        angle_delta = (angle/180) - current_angle
 
         start_time = time()
         elapsed_time = 0
@@ -148,18 +152,24 @@ class servo_controller:
             self.__smooth_move_over_time(self.right_arm, angle, duration)
         else:
             self.__move_servo(self.right_arm, angle)
+
+        self.right_arm_angle = angle
     
     def move_left_arm(self, angle, duration = 0):
         if duration > 0:
             self.__smooth_move_over_time(self.left_arm, angle, duration)
         else:
             self.__move_servo(self.left_arm, angle)
+
+        self.left_arm_angle = angle
     
     def move_head(self, angle, duration = 0):
         if duration > 0:
             self.__smooth_move_over_time(self.head, angle, duration)
         else:
             self.__move_servo(self.head, angle)
+
+        self.head_angle = angle
 
 def test():
     sc = servo_controller()
