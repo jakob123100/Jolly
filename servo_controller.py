@@ -144,6 +144,7 @@ class servo_controller:
             next_value = min(next_value, 1)
             next_value = max(next_value, -1)
             servo.value = next_value
+            sleep(0.01)
 
         servo.value = angle/90 - 1
 
