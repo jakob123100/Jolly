@@ -126,7 +126,7 @@ class servo_controller:
     
     def __smooth_move_over_time(self, servo, angle, duration):
         current_angle = servo.value
-        angle_delta = angle - current_angle
+        angle_delta = angle - current_angle / 90
 
         start_time = time()
         elapsed_time = 0
