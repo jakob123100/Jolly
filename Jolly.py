@@ -358,6 +358,7 @@ def main():
         servo_con.move_left_arm(0)
         servo_con.move_right_arm(0)
         servo_con.move_head(90)
+        servo_con.wait_until_done()
 
     while True:
         try:

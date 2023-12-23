@@ -111,6 +111,8 @@ class servo_controller:
         if self.__head_process != None:
             self.__head_process.join()
         
+        sleep(0.1)
+
         self.__left_arm_process = None
         self.__right_arm_process = None
         self.__head_process = None
