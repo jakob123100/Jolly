@@ -303,6 +303,10 @@ def process_movement_commands(commands):
         elif(command[0] == "SLEEP"):
             time.sleep(command[1])
 
+    servo_con.move_left_arm(0)
+    servo_con.move_right_arm(0)
+    servo_con.move_head(90)
+
 def process_to_question():
     # play a sound to indicate that the robot is listening
     pygame.mixer.music.unload()
@@ -347,6 +351,9 @@ def process_to_question():
 def main():
     if IS_PI:
         led_con.set_light_string(True)
+        servo_con.move_left_arm(0)
+        servo_con.move_right_arm(0)
+        servo_con.move_head(90)
 
     while True:
         try:
