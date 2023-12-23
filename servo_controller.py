@@ -126,7 +126,7 @@ class servo_controller:
     
     def __smooth_move_over_time(self, servo, angle, duration):
         current_angle = servo.value
-        angle_delta = angle - current_angle / 90
+        angle_delta = (angle - current_angle) / 90
 
         start_time = time()
         elapsed_time = 0
@@ -136,6 +136,8 @@ class servo_controller:
             elapsed_time = time() - start_time
             servo.value = current_angle + math.sin(elapsed_time / duration * math.pi) * angle_delta
             sleep(0.01)
+        
+        servo.value = current_angle + angle_delta
 
     def move_right_arm(self, angle, duration = 0):
         if duration > 0:
