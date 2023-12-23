@@ -150,7 +150,9 @@ class servo_controller:
 
     def move_right_arm(self, angle, duration = 0):
         if duration > 0:
-            Process(target=self.__smooth_move_over_time, args=(self.right_arm, angle, duration)).start()
+            p = Process(target=self.__smooth_move_over_time, args=(self.right_arm, angle, duration))
+            p.start()
+            p.join()
         else:
             self.__move_servo(self.right_arm, angle)
 
@@ -158,7 +160,9 @@ class servo_controller:
     
     def move_left_arm(self, angle, duration = 0):
         if duration > 0:
-            Process(target=self.__smooth_move_over_time, args=(self.left_arm, 180 - angle, duration)).start()
+            p = Process(target=self.__smooth_move_over_time, args=(self.left_arm, 180 - angle, duration))
+            p.start()
+            p.join()
         else:
             self.__move_servo(self.left_arm, 180 -  angle)
 
@@ -166,7 +170,9 @@ class servo_controller:
     
     def move_head(self, angle, duration = 0):
         if duration > 0:
-            Process(target=self.__smooth_move_over_time, args=(self.head, angle, duration)).start()
+            p = Process(target=self.__smooth_move_over_time, args=(self.head, angle, duration))
+            p.start()
+            p.join()
         else:
             self.__move_servo(self.head, angle)
 
