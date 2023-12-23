@@ -70,9 +70,9 @@ class led_controller:
         if not self.is_initialized:
             raise Exception("led_controller not initialized")
 
-        GPIO.output(self.red_pin, color[0])
-        GPIO.output(self.green_pin, color[1])
-        GPIO.output(self.blue_pin, color[2])
+        GPIO.output(self.red_pin, not color[0])
+        GPIO.output(self.green_pin, not color[1])
+        GPIO.output(self.blue_pin, not color[2])
     
     def set_light_string(self, is_on):
         """
