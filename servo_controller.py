@@ -119,9 +119,9 @@ class servo_controller:
         #self.head = servo(head_pin, self.SERVO_RANGE_OF_MOTION)
         
         factory = PiGPIOFactory()
-        self.right_arm = Servo(right_arm_pin, min_pulse_width=1/1000, max_pulse_width=2.5/1000, pin_factory=factory)
-        self.left_arm = Servo(left_arm_pin, min_pulse_width=1/1000, max_pulse_width=2.5/1000, pin_factory=factory)
-        self.head = Servo(head_pin, min_pulse_width=1/1000, max_pulse_width=2.5/1000, pin_factory=factory)
+        self.right_arm = Servo(right_arm_pin, min_pulse_width=0.5/1000, max_pulse_width=2.5/1000, pin_factory=factory)
+        self.left_arm = Servo(left_arm_pin, min_pulse_width=0.5/1000, max_pulse_width=2.5/1000, pin_factory=factory)
+        self.head = Servo(head_pin, min_pulse_width=0.5/1000, max_pulse_width=2.5/1000, pin_factory=factory)
 
         self.is_initialized = True
     
@@ -130,7 +130,7 @@ class servo_controller:
     
     def __smooth_move_over_time(self, servo, angle, duration):
         current_angle = servo.value
-        angle_delta = (angle/180) - current_angle
+        angle_delta = angle/90 - (current_angle + 1)
 
         start_time = time()
         elapsed_time = 0
@@ -143,10 +143,8 @@ class servo_controller:
             next_value = min(next_value, 1)
             next_value = max(next_value, -1)
             servo.value = next_value
-            sleep(0.01)
-        
+
         servo.value = angle/90 - 1
-        print("Done moving servo to angle " + str(angle))
 
     def move_right_arm(self, angle, duration = 0):
         if duration > 0:
@@ -158,9 +156,9 @@ class servo_controller:
     
     def move_left_arm(self, angle, duration = 0):
         if duration > 0:
-            self.__smooth_move_over_time(self.left_arm, angle, duration)
+            self.__smooth_move_over_time(self.left_arm, 180 - angle, duration)
         else:
-            self.__move_servo(self.left_arm, angle)
+            self.__move_servo(self.left_arm, 180 -  angle)
 
         self.left_arm_angle = angle
     
