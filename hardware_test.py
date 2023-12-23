@@ -41,8 +41,8 @@ def test():
 
 def test2():
     factory = PiGPIOFactory()
-    right_arm_pin = 23
-    servo = Servo(right_arm_pin, min_pulse_width=0.5/1000, max_pulse_width=2.5/1000, pin_factory=factory)
+    right_arm_pin = 24
+    servo = Servo(right_arm_pin, min_pulse_width=1/1000, max_pulse_width=2.5/1000, pin_factory=factory)
     while True:
         for i in range(0,360):
             servo.value = math.sin(math.radians(i))

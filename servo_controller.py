@@ -4,6 +4,8 @@ import threading
 # Set up libraries and overall settings
 import RPi.GPIO as GPIO  # Imports the standard Raspberry Pi GPIO library
 from time import sleep   # Imports sleep (aka wait or pause) into the program
+from gpiozero import Servo
+from gpiozero.pins.pigpio import PiGPIOFactory
 
 class servo:
     """
@@ -86,14 +88,14 @@ class servo_controller:
     A class that controls the servos connected to a Raspberry Pi using GPIO pins.
     """
 
-    DEFAULT_RIGHT_ARM_PIN = 16
-    DEFAULT_LEFT_ARM_PIN = 22
-    DEFAULT_HEAD_PIN = 18
+    DEFAULT_RIGHT_ARM_PIN = 23
+    DEFAULT_LEFT_ARM_PIN = 25
+    DEFAULT_HEAD_PIN = 24
     SERVO_RANGE_OF_MOTION = 180
 
-    right_arm: servo
-    left_arm: servo
-    head: servo
+    right_arm: Servo
+    left_arm: Servo
+    head: Servo
 
     is_initialized: bool = False
 
@@ -106,40 +108,30 @@ class servo_controller:
             left_arm_pin (int, optional): The GPIO pin number to which the left arm servo is connected. Defaults to 18.
             head_pin (int, optional): The GPIO pin number to which the head servo is connected. Defaults to 22.
         """
-        GPIO.setmode(GPIO.BOARD)
+        GPIO.setmode(GPIO.BCM)
 
-        self.right_arm = servo(right_arm_pin, self.SERVO_RANGE_OF_MOTION)
-        self.left_arm = servo(left_arm_pin, self.SERVO_RANGE_OF_MOTION)
-        self.head = servo(head_pin, self.SERVO_RANGE_OF_MOTION)
+        #self.right_arm = servo(right_arm_pin, self.SERVO_RANGE_OF_MOTION)
+        #self.left_arm = servo(left_arm_pin, self.SERVO_RANGE_OF_MOTION)
+        #self.head = servo(head_pin, self.SERVO_RANGE_OF_MOTION)
+        
+        factory = PiGPIOFactory()
+        self.right_arm = Servo(right_arm_pin, min_pulse_width=1/1000, max_pulse_width=2.5/1000, pin_factory=factory)
+        self.left_arm = Servo(left_arm_pin, min_pulse_width=1/1000, max_pulse_width=2.5/1000, pin_factory=factory)
+        self.head = Servo(head_pin, min_pulse_width=1/1000, max_pulse_width=2.5/1000, pin_factory=factory)
 
         self.is_initialized = True
+    
+    def move_servo(self, servo, angle):
+        servo.value(angle/90 - 1)
 
     def move_right_arm(self, angle):
-        """
-        Moves the right arm servo to the specified angle.
-
-        Args:
-            angle (float): The angle to which the right arm servo should be moved.
-        """
-        self.right_arm.move(angle)
+        self.move_servo(self.right_arm, angle)
     
     def move_left_arm(self, angle):
-        """
-        Moves the left arm servo to the specified angle.
-
-        Args:
-            angle (float): The angle to which the left arm servo should be moved.
-        """
-        self.left_arm.move(self.SERVO_RANGE_OF_MOTION-angle)
+        self.move_servo(self.left_arm, angle)
     
     def move_head(self, angle):
-        """
-        Moves the head servo to the specified angle.
-
-        Args:
-            angle (float): The angle to which the head servo should be moved.
-        """
-        self.head.move(angle)
+        self.move_servo(self.head, angle)
 
 def test():
     sc = servo_controller()
