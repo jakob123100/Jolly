@@ -3,7 +3,7 @@ import math
 import threading
 # Set up libraries and overall settings
 import RPi.GPIO as GPIO  # Imports the standard Raspberry Pi GPIO library
-from time import sleep   # Imports sleep (aka wait or pause) into the program
+from time import sleep, time   # Imports sleep (aka wait or pause) into the program
 from gpiozero import Servo
 from gpiozero.pins.pigpio import PiGPIOFactory
 
@@ -121,35 +121,57 @@ class servo_controller:
 
         self.is_initialized = True
     
-    def move_servo(self, servo, angle):
+    def __move_servo(self, servo, angle):
         servo.value = angle/90 - 1
+    
+    def __smooth_move_over_time(self, servo, angle, duration):
+        current_angle = servo.value
+        angle_delta = angle - current_angle
 
-    def move_right_arm(self, angle):
-        self.move_servo(self.right_arm, angle)
+        start_time = time()
+        elapsed_time = 0
+        
+        # use sine function to make the movement smoother
+        while elapsed_time < duration:
+            elapsed_time = time() - start_time
+            servo.value = current_angle + math.sin(elapsed_time / duration * math.pi) * angle_delta
+            sleep(0.01)
+
+    def move_right_arm(self, angle, duration = 0):
+        if duration > 0:
+            self.__smooth_move_over_time(self.right_arm, angle, duration)
+        else:
+            self.__move_servo(self.right_arm, angle)
     
-    def move_left_arm(self, angle):
-        self.move_servo(self.left_arm, angle)
+    def move_left_arm(self, angle, duration = 0):
+        if duration > 0:
+            self.__smooth_move_over_time(self.left_arm, angle, duration)
+        else:
+            self.__move_servo(self.left_arm, angle)
     
-    def move_head(self, angle):
-        self.move_servo(self.head, angle)
+    def move_head(self, angle, duration = 0):
+        if duration > 0:
+            self.__smooth_move_over_time(self.head, angle, duration)
+        else:
+            self.__move_servo(self.head, angle)
 
 def test():
     sc = servo_controller()
-    sc.move_right_arm(90)
-    sc.move_left_arm(90)
-    sc.move_head(90)
+    sc.move_right_arm(90, 2)
+    sc.move_left_arm(90, 2)
+    sc.move_head(90, 2)
     sleep(1)
-    sc.move_right_arm(0)
-    sc.move_left_arm(0)
-    sc.move_head(0)
+    sc.move_right_arm(0, 2)
+    sc.move_left_arm(0, 2)
+    sc.move_head(0, 2)
     sleep(1)
-    sc.move_right_arm(180)
-    sc.move_left_arm(180)
-    sc.move_head(180)
+    sc.move_right_arm(180, 2)
+    sc.move_left_arm(180, 2)
+    sc.move_head(180, 2)
     sleep(1)
-    sc.move_right_arm(90)
-    sc.move_left_arm(90)
-    sc.move_head(90)
+    sc.move_right_arm(90, 2)
+    sc.move_left_arm(90, 2)
+    sc.move_head(90, 2)
 
 if __name__ == '__main__':
     test()
