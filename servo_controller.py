@@ -150,9 +150,7 @@ class servo_controller:
 
     def move_right_arm(self, angle, duration = 0):
         if duration > 0:
-            p = Process(target=self.__smooth_move_over_time, args=(self.right_arm, angle, duration))
-            p.start()
-            p.join()
+            self.__smooth_move_over_time(self.right_arm, angle, duration)
         else:
             self.__move_servo(self.right_arm, angle)
 
@@ -160,9 +158,7 @@ class servo_controller:
     
     def move_left_arm(self, angle, duration = 0):
         if duration > 0:
-            p = Process(target=self.__smooth_move_over_time, args=(self.left_arm, 180 - angle, duration))
-            p.start()
-            p.join()
+            self.__smooth_move_over_time(self.left_arm, 180 - angle, duration)
         else:
             self.__move_servo(self.left_arm, 180 -  angle)
 
@@ -170,9 +166,7 @@ class servo_controller:
     
     def move_head(self, angle, duration = 0):
         if duration > 0:
-            p = Process(target=self.__smooth_move_over_time, args=(self.head, angle, duration))
-            p.start()
-            p.join()
+            self.__smooth_move_over_time(self.head, angle, duration)
         else:
             self.__move_servo(self.head, angle)
 
@@ -180,25 +174,35 @@ class servo_controller:
 
 def test():
     sc = servo_controller()
-    sc.move_right_arm(0)
-    sc.move_left_arm(0)
-    sc.move_head(0)
-    sleep(1)
-    #sc.move_right_arm(90, 2)
-    #sc.move_left_arm(90, 2)
-    #sc.move_head(90, 2)
-    #sleep(1)
-    sc.move_right_arm(0, 2)
-    sc.move_left_arm(0, 2)
-    sc.move_head(0, 2)
-    sleep(3)
-    sc.move_right_arm(180, 2)
-    sc.move_left_arm(180, 2)
-    sc.move_head(180, 2)
-    sleep(3)
-    sc.move_right_arm(90, 2)
-    sc.move_left_arm(90, 2)
-    sc.move_head(90, 2)
+    p1 = Process(target=sc.move_right_arm, args=(0,))
+    p2 = Process(target=sc.move_left_arm, args=(0,))
+    p3 = Process(target=sc.move_head, args=(0,))
+    p1.start()
+    p2.start()
+    p3.start()
+    p1.join()
+    p2.join()
+    p3.join()
+
+    p1 = Process(target=sc.move_right_arm, args=(180,))
+    p2 = Process(target=sc.move_left_arm, args=(180,))
+    p3 = Process(target=sc.move_head, args=(180,))
+    p1.start()
+    p2.start()
+    p3.start()
+    p1.join()
+    p2.join()
+    p3.join()
+    
+    p1 = Process(target=sc.move_right_arm, args=(90,))
+    p2 = Process(target=sc.move_left_arm, args=(90,))
+    p3 = Process(target=sc.move_head, args=(90,))
+    p1.start()
+    p2.start()
+    p3.start()
+    p1.join()
+    p2.join()
+    p3.join()
 
 if __name__ == '__main__':
     test()
