@@ -6,6 +6,7 @@ import RPi.GPIO as GPIO  # Imports the standard Raspberry Pi GPIO library
 from time import sleep, time   # Imports sleep (aka wait or pause) into the program
 from gpiozero import Servo
 from gpiozero.pins.pigpio import PiGPIOFactory
+from multiprocessing import Process
 
 class servo:
     """
@@ -148,7 +149,7 @@ class servo_controller:
 
     def move_right_arm(self, angle, duration = 0):
         if duration > 0:
-            self.__smooth_move_over_time(self.right_arm, angle, duration)
+            Process(target=self.__smooth_move_over_time, args=(self.right_arm, angle, duration)).start()
         else:
             self.__move_servo(self.right_arm, angle)
 
@@ -156,7 +157,7 @@ class servo_controller:
     
     def move_left_arm(self, angle, duration = 0):
         if duration > 0:
-            self.__smooth_move_over_time(self.left_arm, 180 - angle, duration)
+            Process(target=self.__smooth_move_over_time, args=(self.left_arm, 180 - angle, duration)).start()
         else:
             self.__move_servo(self.left_arm, 180 -  angle)
 
@@ -164,7 +165,7 @@ class servo_controller:
     
     def move_head(self, angle, duration = 0):
         if duration > 0:
-            self.__smooth_move_over_time(self.head, angle, duration)
+            Process(target=self.__smooth_move_over_time, args=(self.head, angle, duration)).start()
         else:
             self.__move_servo(self.head, angle)
 
