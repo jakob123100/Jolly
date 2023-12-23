@@ -134,10 +134,13 @@ class servo_controller:
         # use sine function to make the movement smoother
         while elapsed_time < duration:
             elapsed_time = time() - start_time
-            servo.value = current_angle + math.sin(elapsed_time / duration * math.pi) * angle_delta
+            next_value = current_angle + math.sin(elapsed_time / duration * math.pi) * angle_delta
+            next_value = min(next_value, 1)
+            next_value = max(next_value, -1)
+            servo.value = next_value
             sleep(0.01)
         
-        servo.value = current_angle + angle_delta
+        servo.value = angle/90 - 1
 
     def move_right_arm(self, angle, duration = 0):
         if duration > 0:
