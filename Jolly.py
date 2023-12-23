@@ -295,11 +295,11 @@ def get_movement_command(prompt, response):
 def process_movement_commands(commands):
     for command in commands:
         if(command[0] == "Vänster"):
-            servo_con.move_left_arm(command[1] * servo_con.SERVO_RANGE_OF_MOTION, 2)
+            servo_con.move_left_arm(command[1] * servo_con.SERVO_RANGE_OF_MOTION, command[1] * 2)
         elif(command[0] == "Höger"):
-            servo_con.move_right_arm(command[1] * servo_con.SERVO_RANGE_OF_MOTION, 2)
+            servo_con.move_right_arm(command[1] * servo_con.SERVO_RANGE_OF_MOTION, command[1] * 2)
         elif(command[0] == "HUVUD"):
-            servo_con.move_head(command[1] * servo_con.SERVO_RANGE_OF_MOTION, 2)
+            servo_con.move_head(command[1] * servo_con.SERVO_RANGE_OF_MOTION, command[1] * 2)
         elif(command[0] == "SLEEP"):
             servo_con.wait_until_done()
             time.sleep(command[1])
