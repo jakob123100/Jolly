@@ -267,7 +267,20 @@ def get_movement_command(prompt, response):
     Varje kommando ska vara på formen "Vänster: [vänster arm], Höger: [höger arm], HUVUD: [huvud]".
     Vänster arm, höger arm och huvud ska vara tal mellan 0 och 1 där 0 är nedåt/vänster och 1 är uppåt/höger.
     Ett exempel på ett svar är "Vänster: 0.5, Höger: 0.5, HUVUD: 0.5, SLEEP: 2, Vänster: 0.2, Höger: 0.8, HUVUD: 0.3, SLEEP: 1".
+    Ditt vanliga svar ska vara "Vänster: 0, Höger: 0, HUVUD: 0, SLEEP: 0".
     """
+
+    if response == "":
+        # Skicka beskrivningen till ChatGPT och få ett svar
+        response = openai_client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            temperature=0.2,
+            max_tokens=150,
+            messages=[
+                {"role": "system", "content": description},
+                {"role": "user", "content": prompt},
+            ],
+        )
 
     # Skicka beskrivningen till ChatGPT och få ett svar
     response = openai_client.chat.completions.create(
