@@ -293,7 +293,6 @@ def get_movement_command(prompt, response):
     return commands
 
 def process_movement_commands(commands):
-    hold_time = 0
     for command in commands:
         if(command[0] == "Vänster"):
             servo_con.move_left_arm(command[1] * servo_con.SERVO_RANGE_OF_MOTION, 2)
@@ -302,10 +301,8 @@ def process_movement_commands(commands):
         elif(command[0] == "HUVUD"):
             servo_con.move_head(command[1] * servo_con.SERVO_RANGE_OF_MOTION, 2)
         elif(command[0] == "SLEEP"):
-            hold_time = command[1]
-    
-    servo_con.wait_until_done()
-    time.sleep(hold_time)
+            servo_con.wait_until_done()
+            time.sleep(command[1])
 
     servo_con.move_left_arm(0, 2)
     servo_con.move_right_arm(0, 2)
