@@ -32,11 +32,11 @@ while(not has_internet_connection()):
     pass
 
 if IS_PI:
-    import led_controller
-    import servo_controller
-    led_con = led_controller.led_controller()
-    servo_con = servo_controller.servo_controller()
-    led_con.set_eye_color(led_controller.colors.black)
+    from led_controller import led_controller, colors
+    from servo_controller import servo_controller
+    led_con: led_controller = led_controller()
+    servo_con: servo_controller = servo_controller()
+    led_con.set_eye_color(colors.black)
 
 
 
@@ -295,11 +295,11 @@ def get_movement_command(prompt, response):
 def process_movement_commands(commands):
     for command in commands:
         if(command[0] == "Vänster"):
-            servo_con.move_left_arm(command[1] * servo_con.range_of_motion)
+            servo_con.move_left_arm(command[1] * servo_con.SERVO_RANGE_OF_MOTION)
         elif(command[0] == "Höger"):
-            servo_con.move_right_arm(command[1] * servo_con.range_of_motion)
+            servo_con.move_right_arm(command[1] * servo_con.SERVO_RANGE_OF_MOTION)
         elif(command[0] == "HUVUD"):
-            servo_con.move_head(command[1] * servo_con.range_of_motion)
+            servo_con.move_head(command[1] * servo_con.SERVO_RANGE_OF_MOTION)
         elif(command[0] == "SLEEP"):
             time.sleep(command[1])
 
@@ -311,13 +311,13 @@ def process_to_question():
 
     
     if IS_PI:
-        led_con.set_eye_color(led_controller.colors.blue)
+        led_con.set_eye_color(colors.blue)
 
     text = vr.listen_for_command()
     print("Du sa: " + text)
     
     if IS_PI:
-        led_con.set_eye_color(led_controller.colors.yellow)
+        led_con.set_eye_color(colors.yellow)
 
     if(process_to_music_commands(text)):
         return
@@ -326,7 +326,7 @@ def process_to_question():
     response = get_gpt3_response(text)
     
     if IS_PI:
-        led_con.set_eye_color(led_controller.colors.green)
+        led_con.set_eye_color(colors.green)
 
     if IS_PI:
         movment_commands = get_movement_command(text, response)
@@ -345,7 +345,7 @@ def main():
     while True:
         try:
             if IS_PI:
-                led_con.set_eye_color(led_controller.colors.white)
+                led_con.set_eye_color(colors.white)
             vr.wait_for_activation_phrase()
             process_to_question()
         except Exception as e:
