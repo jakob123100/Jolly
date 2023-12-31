@@ -24,7 +24,7 @@ class VoiceRecongnizer:
     recognizer_listen_pause_threshold = 1
     recognizer_dynamic_energy_ratio = 3
 
-    activation_phrases = ["hello robot", "hello bot", "hello roger", "hello droid"]
+    activation_phrases = ["hey robot", "hey bot", "hey roger", "hey droid"]
     
     recognizer = sr.Recognizer()
     recognizer.energy_threshold = recognizer_energy_threshold
